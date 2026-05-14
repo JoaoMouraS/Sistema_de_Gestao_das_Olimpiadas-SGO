@@ -208,19 +208,19 @@ O SGO é um sistema para coordenar os diferentes aspectos das Olimpíadas: geren
 ## Diagramas
 
 ### Diagrama de Caso de Uso
-<img width="800px" src="imagens/Diagrama-De-Caso-De-Uso.png"/>
+<img width="800px" src="Imagens/Diagrama-De-Caso-De-Uso.png"/>
 
 ### Diagrama de Classes
-<img width="800px" src="imagens/Diagrama-De-Classes.png"/>
+<img width="800px" src="Imagens/Diagrama-De-Classes.png"/>
 
 ### Diagrama de Pacotes
-<img width="800px" src="imagens/Diagrama-De-Pacotes.png"/>
+<img width="800px" src="Imagens/Diagrama-De-Pacotes.png"/>
 
 ### Diagrama de Componentes
-<img width="800px" src="imagens/Diagrama-De-Componentes.png"/>
+<img width="800px" src="Imagens/Diagrama-De-Componentes.png"/>
 
 ### Diagrama de Implantação
-<img width="800px" src="imagens/Diagrama-De-Implantacao.png"/>
+<img width="800px" src="Imagens/Diagrama-De-Implantacao.png"/>
 
 ---
 
