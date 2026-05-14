@@ -1,0 +1,152 @@
+@startuml diagrama-de-componentes
+
+title Diagrama de Componentes
+
+skinparam component {
+    BackgroundColor LightCyan
+    BorderColor SteelBlue
+    FontStyle Bold
+}
+skinparam interface {
+    BackgroundColor LightYellow
+    BorderColor DarkGoldenrod
+}
+skinparam database {
+    BackgroundColor LightPink
+    BorderColor DarkRed
+}
+skinparam node {
+    BackgroundColor WhiteSmoke
+    BorderColor Gray
+}
+skinparam cloud {
+    BackgroundColor White
+    BorderColor #A0A0A0
+}
+skinparam linetype ortho
+skinparam nodesep 20
+skinparam ranksep 40
+
+' ─────────────────────────────────────────
+' CAMADA DE CLIENTE
+' ─────────────────────────────────────────
+node "Interfaces de Usuário (Browser/App)" as UI {
+    [Telas do SGO] as Telas
+}
+
+' ─────────────────────────────────────────
+' API GATEWAY 
+' ─────────────────────────────────────────
+component "API Gateway\n(REST – HTTP/JSON)" as APIGateway #LightGray
+
+Telas -down-> APIGateway : HTTP/REST
+
+' ─────────────────────────────────────────
+' COLUNAS DE SERVIÇOS
+' ─────────────────────────────────────────
+
+package "Módulo Competições" as MComp {
+    interface "ICompeticao" as ICompSvc
+    component "Serviço de\nCompetições" as CompSvc
+    component "Validador\nModalidade" as ValMod
+    interface "IRepoComp" as IRepoComp
+    component "Repo\nCompetições" as RepoComp
+    
+    ICompSvc -down-> CompSvc
+    CompSvc -down-> ValMod
+    CompSvc -down-> IRepoComp
+    IRepoComp -down-> RepoComp
+}
+
+package "Módulo Inscrições" as MInsc {
+    interface "IInscricao"  as IInscSvc
+    component "Serviço de\nInscrições" as InscSvc
+    component "Validador\nPaís" as ValPais
+    interface "IRepoInsc" as IRepoInsc
+    component "Repo\nInscrições" as RepoInsc
+    
+    IInscSvc -down-> InscSvc
+    InscSvc -down-> ValPais
+    InscSvc -down-> IRepoInsc
+    IRepoInsc -down-> RepoInsc
+}
+
+package "Módulo Alocação" as MAloc {
+    interface "IAlocacao"   as IAlocSvc
+    component "Serviço de\nAlocação" as AlocSvc
+    component "Verificador\nConflito" as VerConf
+    interface "IRepoLocal" as IRepoLocal
+    component "Repo\nLocais" as RepoLocal
+    
+    IAlocSvc -down-> AlocSvc
+    AlocSvc -down-> VerConf
+    AlocSvc -down-> IRepoLocal
+    IRepoLocal -down-> RepoLocal
+}
+
+package "Módulo Resultados" as MRes {
+    interface "IResultado"  as IResSvc
+    component "Serviço de\nResultados" as ResSvc
+    component "Classificador" as ClassAtl
+    interface "IRepoRes" as IRepoRes
+    component "Repo\nResultados" as RepoRes
+    
+    IResSvc -down-> ResSvc
+    ResSvc -down-> ClassAtl
+    ResSvc -down-> IRepoRes
+    IRepoRes -down-> RepoRes
+}
+
+package "Módulo Relatórios" as MRel {
+    interface "IRelatorio"  as IRelSvc
+    component "Serviço de\nRelatórios" as RelSvc
+    component "Gerador\nRanking" as GenRank
+    interface "IRepoRel" as IRepoRel
+    component "Exportador\n(PDF/Excel)" as Exp
+    
+    IRelSvc -down-> RelSvc
+    RelSvc -down-> GenRank
+    RelSvc -down-> IRepoRel
+    RelSvc -down-> Exp
+}
+
+' ─────────────────────────────────────────
+' DISTRIBUIÇÃO DO API GATEWAY
+' ─────────────────────────────────────────
+APIGateway -down-> ICompSvc : HTTP/REST
+APIGateway -down-> IInscSvc : HTTP/REST
+APIGateway -down-> IAlocSvc : HTTP/REST
+APIGateway -down-> IResSvc  : HTTP/REST
+APIGateway -down-> IRelSvc  : HTTP/REST
+
+MComp -[hidden]right-> MInsc
+MInsc -[hidden]right-> MAloc
+MAloc -[hidden]right-> MRes
+MRes  -[hidden]right-> MRel
+
+' ─────────────────────────────────────────
+' COMUNICAÇÃO CRUZADA
+' ─────────────────────────────────────────
+InscSvc --> ICompSvc
+AlocSvc --> ICompSvc
+ResSvc  --> IInscSvc
+RelSvc  --> IResSvc
+
+' ─────────────────────────────────────────
+' CAMADA DE DADOS E SERVIÇOS EXTERNOS
+' ─────────────────────────────────────────
+database "Banco de Dados\n(PostgreSQL)" as BD
+
+cloud "Serviço de E-mail\n(Notificações)" as Email
+cloud "Armazenamento S3\n(Arquivos PDF/Excel)" as S3
+
+RepoComp -down-> BD
+RepoInsc -down-> BD
+RepoLocal -down-> BD
+RepoRes -down-> BD
+IRepoRel -down-> BD
+
+ResSvc -down-> Email
+Exp -down-> S3
+
+@enduml

@@ -1,0 +1,82 @@
+@startuml diagrama-de-caso-de-uso
+
+title Diagrama de Caso de Uso
+
+left to right direction
+skinparam actorStyle awesome
+skinparam usecase {
+    BackgroundColor LightBlue
+    BorderColor DarkBlue
+    ArrowColor DarkBlue
+}
+skinparam actor {
+    BackgroundColor LightYellow
+    BorderColor DarkOrange
+}
+
+' ─────────────────────────────────────────
+' ATORES
+' ─────────────────────────────────────────
+actor "Atleta"             as Atleta
+actor "Comitê Olímpico"    as Comite
+
+' ─────────────────────────────────────────
+' PACOTE PRINCIPAL DO SISTEMA
+' ─────────────────────────────────────────
+rectangle "SGO – Sistema de Gestão das Olimpíadas" {
+
+        usecase "Cadastrar Competição"       as UC01
+        usecase "Editar Competição"          as UC02
+        usecase "Listar Competições"         as UC03
+        usecase "Cancelar Competição"        as UC04
+    
+        usecase "Cadastrar Atleta"           as UC05
+        usecase "Inscrever Atleta em\nCompetição" as UC06
+        usecase "Validar Representação\nde País"  as UC07
+        usecase "Cancelar Inscrição"         as UC08
+
+        usecase "Cadastrar Local"            as UC09
+        usecase "Alocar Local para\nCompetição" as UC10
+        usecase "Verificar Conflito\nde Horário" as UC11
+
+        usecase "Registrar Resultado"        as UC13
+        usecase "Definir Vencedor\ne Classificados" as UC14
+        usecase "Consultar Resultados"       as UC15
+
+        usecase "Gerar Relatório\nde Medalhas"   as UC16
+        usecase "Visualizar Quadro\nde Medalhas" as UC17
+        usecase "Exportar Relatório"         as UC18
+}
+
+' ─────────────────────────────────────────
+' RELACIONAMENTOS – Comitê Olímpico (ESQUERDA)
+' ─────────────────────────────────────────
+Comite --> UC01
+Comite --> UC03
+Comite --> UC05
+Comite --> UC09
+Comite --> UC10
+Comite --> UC13
+Comite --> UC16
+Comite --> UC15
+
+' ─────────────────────────────────────────
+' RELACIONAMENTOS – Atleta (DIREITA)
+' ─────────────────────────────────────────
+UC06 <-- Atleta
+UC15 <-- Atleta
+
+' ─────────────────────────────────────────
+' INCLUDE / EXTEND
+' ─────────────────────────────────────────
+UC06 .> UC07 : <<include>>
+UC10 .> UC11 : <<include>>
+UC13 .> UC14 : <<include>>
+UC16 .> UC17 : <<include>>
+
+UC02 .> UC01 : <<extend>>
+UC04 .> UC01 : <<extend>>
+UC08 .> UC06 : <<extend>>
+UC18 .> UC16 : <<extend>>
+
+@enduml

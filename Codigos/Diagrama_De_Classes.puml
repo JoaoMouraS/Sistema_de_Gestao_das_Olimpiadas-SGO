@@ -1,0 +1,166 @@
+@startuml diagrama-de-classes
+
+title Diagrama de Classes
+
+skinparam classAttributeIconSize 0
+skinparam classFontStyle Bold
+skinparam class {
+    BackgroundColor LightCyan
+    BorderColor SteelBlue
+    ArrowColor DarkSlateGray
+}
+skinparam stereotypeCBackgroundColor LightYellow
+
+' ─────────────────────────────────────────
+' ENUMERAÇÕES
+' ─────────────────────────────────────────
+enum TipoMedalha {
+    OURO
+    PRATA
+    BRONZE
+}
+
+enum StatusCompetição {
+    AGENDADA
+    EM_ANDAMENTO
+    CONCLUIDA
+    CANCELADA
+}
+
+enum StatusInscrição {
+    PENDENTE
+    CONFIRMADA
+    CANCELADA
+}
+
+enum TipoModalidade {
+    INDIVIDUAL
+    DUPLA
+    TRIO
+    EQUIPE
+}
+
+' ─────────────────────────────────────────
+' CLASSES PRINCIPAIS
+' ─────────────────────────────────────────
+
+class País {
+    - id         : Long
+    - nome       : String
+    - sigla      : String {length=3}
+    + getId()    : Long
+    + getNome()  : String
+    + getSigla() : String
+}
+
+class Atleta {
+    - id            : Long
+    - nome          : String
+    - dataNascimento: LocalDate
+    - sexo          : String
+    - cpf           : String {length=11..14}
+    + getId()       : Long
+    + getNome()     : String
+}
+
+class Modalidade {
+    - id     : Long
+    - nome   : String       
+    - tipo   : TipoModalidade 
+    + getId(): Long
+    + getNome(): String
+    + getTipo(): TipoModalidade
+}
+
+class Competição {
+    - id          : Long
+    - nome        : String
+    - data        : LocalDate
+    - horarioInicio: LocalTime
+    - horarioFim  : LocalTime
+    - status      : StatusCompetição
+    + getId()     : Long
+    + getNome()   : String
+    + getStatus() : StatusCompetição
+    + isDisponivel(): Boolean
+}
+
+class Local {
+    - id         : Long
+    - nome       : String
+    - endereco   : String
+    - capacidade : Integer
+    + getId()    : Long
+    + getNome()  : String
+    + isDisponivel(data: LocalDate, inicio: LocalTime, fim: LocalTime): Boolean
+}
+
+class Inscrição {
+    - id           : Long
+    - dataInscricao: LocalDateTime
+    - status       : StatusInscrição
+    + getId()      : Long
+    + getStatus()  : StatusInscrição
+    + confirmar()  : void
+}
+
+class Resultado {
+    - id          : Long
+    - dataRegistro: LocalDateTime
+    - observacoes : String
+    + getId()     : Long
+    + registrar()  : void
+}
+
+class Classificação {
+    - posicao   : Integer      
+    - medalha   : TipoMedalha
+    - marca     : String       
+    + getPosicao(): Integer
+    + getMedalha(): TipoMedalha
+}
+
+class RelatorioMedalhas <<Service>> {
+    - dataGeracao  : LocalDateTime
+    + gerar()      : void
+    + exportar()   : void
+    + getTotal(p: País, t: TipoMedalha): Integer
+}
+
+class AlocacaoLocal {
+    - id           : Long
+    - dataAlocacao : LocalDateTime
+    + verificarConflito(): Boolean
+    + alocar()     : void
+}
+
+' ─────────────────────────────────────────
+' RELACIONAMENTOS
+' ─────────────────────────────────────────
+
+Atleta        "0..*" -->  "1"   País
+Atleta        "1"  *--  "0..*"  Inscrição
+Inscrição     "0..*" -->  "1"   Competição
+Inscrição     "0..*" -->  "1"   País
+
+' Associações Simples
+Competição    "0..*" -->  "1"   Modalidade
+AlocacaoLocal "0..*" -->  "1"   Local
+Classificação "0..*" -->  "1"   Atleta
+
+' Composições Estruturais
+Competição    "1"   *--  "0..1" AlocacaoLocal
+Competição    "1"   *--  "0..1" Resultado
+Resultado     "1"   *--  "1..3" Classificação
+
+' Dependências
+RelatorioMedalhas "0..*" --> "0..*" Resultado
+RelatorioMedalhas "0..*" --> "0..*" País
+
+' Enumerações
+Competição    ..>  StatusCompetição
+Inscrição     ..>  StatusInscrição
+Classificação ..>  TipoMedalha
+Modalidade    ..>  TipoModalidade
+
+@enduml

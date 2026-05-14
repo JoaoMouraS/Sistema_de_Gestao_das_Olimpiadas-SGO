@@ -1,0 +1,74 @@
+@startuml diagrama-de-implantacao
+
+title Diagrama de Implantação – SGO
+
+skinparam node {
+    BackgroundColor LightYellow
+    BorderColor DarkGoldenrod
+    FontStyle Bold
+}
+skinparam component {
+    BackgroundColor LightCyan
+    BorderColor SteelBlue
+}
+skinparam database {
+    BackgroundColor LightPink
+    BorderColor DarkRed
+}
+skinparam cloud {
+    BackgroundColor White
+    BorderColor #A0A0A0
+}
+skinparam linetype ortho
+skinparam nodesep 40
+skinparam ranksep 50
+
+' ── CLIENTES ────────────────────────────────────────────
+node "Dispositivo do Usuário\n(Atleta / Comitê Olímpico)" as Client {
+    [Navegador Web] as Browser
+}
+
+' ── SERVIDOR WEB ────────────────────────────────────────
+node "Servidor Web (Nginx)" as WebServer {
+    [Frontend SPA - Telas do SGO] as Frontend
+}
+
+Browser -down-> WebServer : HTTPS
+
+' ── SERVIDOR DE APLICAÇÃO ───────────────────────────────
+node "Servidor de Aplicação (Porta 8080)" as AppServer {
+    [API Gateway - REST/JSON] as API
+    [Modulo Competicoes]  as CompSvc
+    [Modulo Inscricoes]   as InscSvc
+    [Modulo Alocacao]     as AlocSvc
+    [Modulo Resultados]   as ResSvc
+    [Modulo Relatorios]   as RelSvc
+
+    Frontend -down-> API : HTTP/REST
+
+    API -down-> CompSvc
+    API -down-> InscSvc
+    API -down-> AlocSvc
+    API -down-> ResSvc
+    API -down-> RelSvc
+}
+
+' ── BANCO DE DADOS ──────────────────────────────────────
+node "Servidor de Banco de Dados\n(PostgreSQL - Porta 5432)" as DBServer {
+    database "SGO_DB\n(Pais, Atleta, Competicao,\nLocal, Inscricao, Resultado)" as BD
+}
+
+CompSvc -down-> BD : JDBC
+InscSvc -down-> BD : JDBC
+AlocSvc -down-> BD : JDBC
+ResSvc  -down-> BD : JDBC
+RelSvc  -down-> BD : JDBC
+
+' ── SERVIÇOS EXTERNOS ───────────────────────────────────
+cloud "Servico de E-mail\n(Notificacoes)" as Email
+cloud "Armazenamento S3\n(PDF / Excel)" as S3
+
+ResSvc -right-> Email : notifica resultado
+RelSvc -right-> S3    : exporta relatorio
+
+@enduml

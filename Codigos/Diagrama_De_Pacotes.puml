@@ -1,0 +1,69 @@
+@startuml diagrama-de-pacotes
+title Diagrama de Pacotes - SGO 
+
+skinparam packageStyle folder
+skinparam linetype ortho
+skinparam nodesep 40
+skinparam ranksep 40
+skinparam classAttributeIconSize 0
+
+skinparam package {
+    BackgroundColor White
+    BorderColor DarkSlateGray
+    FontColor Black
+}
+skinparam class {
+    BackgroundColor LightCyan
+    BorderColor SteelBlue
+}
+
+package "Sistema de Gestão das Olimpíadas (SGO)" {
+
+    ' Módulo 1
+    package "Gestão de Participantes" {
+        package "sgo.pais" as pacPais {
+            class País
+        }
+        package "sgo.atleta" as pacAtleta {
+            class Atleta
+            class Inscrição
+        }
+    }
+
+    ' Módulo 2
+    package "Gestão de Eventos" {
+        package "sgo.competicao" as pacComp {
+            class Competição
+            class Modalidade
+        }
+        package "sgo.local" as pacLocal {
+            class Local
+            class AlocacaoLocal
+        }
+    }
+
+    ' Módulo 3
+    package "Gestão de Desempenho" {
+        package "sgo.resultado" as pacResult {
+            class Resultado
+            class Classificação
+        }
+        package "sgo.relatorio" as pacRelatorio {
+            class RelatorioMedalhas
+        }
+    }
+}
+
+' ─────────────────────────────────────────
+' DEPENDÊNCIAS ENTRE OS PACOTES
+' ─────────────────────────────────────────
+
+pacAtleta .up.> pacPais : " representa"
+pacComp .up.> pacAtleta : " inscreve"
+pacComp .down.> pacLocal : " aloca"
+pacResult .up.> pacComp : " avalia"
+pacRelatorio .left.> pacResult : " consolida"
+pacRelatorio .up.> pacPais : " rankeia"
+
+hide members
+@enduml
